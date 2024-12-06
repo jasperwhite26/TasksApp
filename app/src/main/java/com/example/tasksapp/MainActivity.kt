@@ -1,11 +1,9 @@
 package com.example.tasksapp
 
 import android.os.Bundle
-import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.arch.core.internal.SafeIterableMap.SupportRemove
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -32,10 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tasksapp.ui.theme.TasksAppTheme
@@ -48,7 +42,6 @@ class MainActivity : ComponentActivity() {
             TasksAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     TaskApp(
-                        name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -58,9 +51,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TaskApp(name: String, modifier: Modifier = Modifier) {
+fun TaskApp(modifier: Modifier = Modifier) {
     var tasks by remember { mutableStateOf(listOf<String>()) }
-    var currentTask by remember { mutableStateOf(TextFieldValue("")) }
+    var currentTask by remember { mutableStateOf("") }
 
     Column (
         verticalArrangement = Arrangement.Top,
@@ -75,8 +68,6 @@ fun TaskApp(name: String, modifier: Modifier = Modifier) {
                 .padding(bottom = 16.dp, top = 40.dp)
                 .align(alignment = Alignment.Start)
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
         Column {
             for(task in tasks){
                 TaskItem(task) {
@@ -85,10 +76,13 @@ fun TaskApp(name: String, modifier: Modifier = Modifier) {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        TaskInput(currentTask, onTaskAdded = {newTask ->
-            if (newTask.isNotBlank()){
-                tasks = tasks + newTask
-                currentTask = TextFieldValue("")
+        TaskInput(
+            currentTask,
+            onTaskChanged = { newTask -> currentTask = newTask},
+            onTaskAdded = {
+            if (it.isNotBlank()){
+                tasks = tasks + it
+                currentTask = ""
             }
         })
     }
@@ -114,14 +108,16 @@ fun TaskItem(task: String, onRemove: () -> Unit) {
 
 @Composable
 fun TaskInput(
-    currentTask: TextFieldValue,
+    currentTask: String,
+    onTaskChanged : (String) -> Unit,
     onTaskAdded: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
+    var text by remember { mutableStateOf("") }
 
     TextField(
         value = currentTask,
-        onValueChange = { newValue -> currentTask = newValue},
+        onValueChange = { text = it},
         label = { Text(stringResource(R.string.input_text))},
         singleLine = true,
         keyboardOptions = KeyboardOptions(),
@@ -129,7 +125,7 @@ fun TaskInput(
     )
     Spacer(modifier = Modifier.width(8.dp))
 
-    Button(onClick = { onTaskAdded(currentTask.text) }) {
+    Button(onClick = { onTaskAdded(currentTask) }) {
         Text("Add")
 
     }
@@ -140,6 +136,6 @@ fun TaskInput(
 @Composable
 fun GreetingPreview() {
     TasksAppTheme {
-        TaskApp("Android")
+        TaskApp()
     }
 }
