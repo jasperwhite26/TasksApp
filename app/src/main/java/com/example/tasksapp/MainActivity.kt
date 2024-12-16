@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tasksapp.ui.theme.TasksAppTheme
@@ -78,7 +79,6 @@ fun TaskApp(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         TaskInput(
             currentTask,
-            onTaskChanged = { newTask -> currentTask = newTask},
             onTaskAdded = {
             if (it.isNotBlank()){
                 tasks = tasks + it
@@ -109,7 +109,6 @@ fun TaskItem(task: String, onRemove: () -> Unit) {
 @Composable
 fun TaskInput(
     currentTask: String,
-    onTaskChanged : (String) -> Unit,
     onTaskAdded: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -120,7 +119,7 @@ fun TaskInput(
         onValueChange = { text = it},
         label = { Text(stringResource(R.string.input_text))},
         singleLine = true,
-        keyboardOptions = KeyboardOptions(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         modifier = modifier
     )
     Spacer(modifier = Modifier.width(8.dp))
